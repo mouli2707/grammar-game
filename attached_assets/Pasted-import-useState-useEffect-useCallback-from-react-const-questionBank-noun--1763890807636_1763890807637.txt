@@ -1,0 +1,871 @@
+import { useState, useEffect, useCallback } from 'react';
+
+const questionBank = {
+  noun: [
+    { q: "Which word is a noun?", options: ["run", "happy", "dog", "quickly"], answer: "dog", level: 1 },
+    { q: "Find the noun: 'The cat sleeps on the bed.'", options: ["sleeps", "on", "bed", "the"], answer: "bed", level: 1 },
+    { q: "What is a noun?", options: ["action word", "naming word", "describing word", "connecting word"], answer: "naming word", level: 1 },
+    { q: "Which is a proper noun?", options: ["city", "London", "river", "school"], answer: "London", level: 2 },
+    { q: "Identify the abstract noun:", options: ["table", "happiness", "teacher", "apple"], answer: "happiness", level: 2 },
+    { q: "Which is NOT a noun?", options: ["joy", "quickly", "book", "teacher"], answer: "quickly", level: 2 },
+    { q: "Which word is a collective noun?", options: ["bird", "flock", "flying", "sky"], answer: "flock", level: 3 },
+    { q: "Find the common noun: 'Dr. Smith works at the hospital.'", options: ["Dr.", "Smith", "works", "hospital"], answer: "hospital", level: 3 },
+    { q: "Which is a place noun?", options: ["running", "beautiful", "library", "softly"], answer: "library", level: 3 },
+    { q: "Which is a concrete noun?", options: ["freedom", "love", "banana", "courage"], answer: "banana", level: 4 },
+    { q: "Identify the plural noun:", options: ["child", "children", "mouse", "tooth"], answer: "children", level: 4 },
+    { q: "Which shows more than one?", options: ["box", "boxes", "boxing", "boxer"], answer: "boxes", level: 4 },
+    { q: "Find the compound noun:", options: ["sunshine", "bright", "warm", "shining"], answer: "sunshine", level: 5 },
+    { q: "Which word names an idea?", options: ["desk", "pencil", "freedom", "chair"], answer: "freedom", level: 5 },
+    { q: "Identify the proper noun:", options: ["ocean", "Pacific Ocean", "water", "wave"], answer: "Pacific Ocean", level: 5 }
+  ],
+  verb: [
+    { q: "Which word is a verb?", options: ["jump", "beautiful", "tree", "slowly"], answer: "jump", level: 1 },
+    { q: "Find the verb: 'She sings every morning.'", options: ["She", "sings", "every", "morning"], answer: "sings", level: 1 },
+    { q: "What does a verb show?", options: ["person", "action", "place", "thing"], answer: "action", level: 1 },
+    { q: "Which is a past tense verb?", options: ["run", "running", "ran", "runs"], answer: "ran", level: 2 },
+    { q: "Identify the helping verb: 'I am eating lunch.'", options: ["I", "am", "eating", "lunch"], answer: "am", level: 2 },
+    { q: "Which verb means now?", options: ["walked", "walk", "will walk", "walking"], answer: "walk", level: 2 },
+    { q: "Which is an action verb?", options: ["is", "seem", "dance", "appear"], answer: "dance", level: 3 },
+    { q: "Find the linking verb: 'The soup tastes delicious.'", options: ["soup", "tastes", "delicious", "The"], answer: "tastes", level: 3 },
+    { q: "Which verb shows being?", options: ["run", "jump", "is", "eat"], answer: "is", level: 3 },
+    { q: "Which sentence uses future tense?", options: ["I walked home.", "I walk home.", "I will walk home.", "I am walking."], answer: "I will walk home.", level: 4 },
+    { q: "Identify the irregular verb:", options: ["walked", "jumped", "swam", "talked"], answer: "swam", level: 4 },
+    { q: "Which is the past tense of 'eat'?", options: ["eated", "ate", "eating", "eats"], answer: "ate", level: 4 },
+    { q: "Find the verb phrase: 'She has been studying all day.'", options: ["She", "has been studying", "all", "day"], answer: "has been studying", level: 5 },
+    { q: "Which verb needs a helper?", options: ["run", "been running", "runs", "ran"], answer: "been running", level: 5 },
+    { q: "Identify the main verb: 'They will go tomorrow.'", options: ["They", "will", "go", "tomorrow"], answer: "go", level: 5 }
+  ],
+  adjective: [
+    { q: "Which word is an adjective?", options: ["run", "blue", "quickly", "house"], answer: "blue", level: 1 },
+    { q: "Find the adjective: 'The tall boy won.'", options: ["The", "tall", "boy", "won"], answer: "tall", level: 1 },
+    { q: "What does an adjective describe?", options: ["action", "noun", "verb", "sentence"], answer: "noun", level: 1 },
+    { q: "Which describes a noun?", options: ["slowly", "bright", "jump", "under"], answer: "bright", level: 2 },
+    { q: "Identify the adjective: 'She wore a beautiful dress.'", options: ["She", "wore", "beautiful", "dress"], answer: "beautiful", level: 2 },
+    { q: "Which word describes size?", options: ["happy", "tiny", "softly", "run"], answer: "tiny", level: 2 },
+    { q: "Which is a comparative adjective?", options: ["tall", "taller", "tallest", "tallness"], answer: "taller", level: 3 },
+    { q: "Find the superlative adjective:", options: ["good", "better", "best", "well"], answer: "best", level: 3 },
+    { q: "Which compares two things?", options: ["big", "bigger", "biggest", "bigness"], answer: "bigger", level: 3 },
+    { q: "Which is a demonstrative adjective?", options: ["happy", "this", "many", "large"], answer: "this", level: 4 },
+    { q: "Identify the predicate adjective: 'The cake is delicious.'", options: ["cake", "is", "delicious", "The"], answer: "delicious", level: 4 },
+    { q: "Which adjective describes color?", options: ["slowly", "green", "running", "loudly"], answer: "green", level: 4 },
+    { q: "Find the compound adjective:", options: ["happy", "well-known", "bright", "small"], answer: "well-known", level: 5 },
+    { q: "Which shows the most?", options: ["smart", "smarter", "smartest", "smartly"], answer: "smartest", level: 5 },
+    { q: "Identify the adjective: 'An honest person tells the truth.'", options: ["honest", "person", "tells", "truth"], answer: "honest", level: 5 }
+  ],
+  adverb: [
+    { q: "Which word is an adverb?", options: ["fast", "quickly", "quick", "speed"], answer: "quickly", level: 1 },
+    { q: "Find the adverb: 'He runs fast.'", options: ["He", "runs", "fast", "the"], answer: "fast", level: 1 },
+    { q: "What does an adverb describe?", options: ["noun", "verb", "pronoun", "preposition"], answer: "verb", level: 1 },
+    { q: "Which adverb tells 'how'?", options: ["tomorrow", "here", "gently", "never"], answer: "gently", level: 2 },
+    { q: "Identify the adverb: 'She always eats breakfast.'", options: ["She", "always", "eats", "breakfast"], answer: "always", level: 2 },
+    { q: "Which word ends in -ly?", options: ["quick", "slowly", "slow", "fast"], answer: "slowly", level: 2 },
+    { q: "Which adverb tells 'when'?", options: ["loudly", "outside", "yesterday", "very"], answer: "yesterday", level: 3 },
+    { q: "Find the adverb of place:", options: ["slowly", "there", "often", "really"], answer: "there", level: 3 },
+    { q: "Which tells where?", options: ["quickly", "inside", "always", "soon"], answer: "inside", level: 3 },
+    { q: "Which is an adverb of frequency?", options: ["carefully", "usually", "everywhere", "soon"], answer: "usually", level: 4 },
+    { q: "Identify the adverb modifying an adjective: 'She is very tall.'", options: ["She", "is", "very", "tall"], answer: "very", level: 4 },
+    { q: "Which adverb tells how often?", options: ["here", "tomorrow", "sometimes", "carefully"], answer: "sometimes", level: 4 },
+    { q: "Which adverb shows degree?", options: ["now", "here", "extremely", "daily"], answer: "extremely", level: 5 },
+    { q: "Find the adverb: 'The rabbit hopped away.'", options: ["rabbit", "hopped", "away", "The"], answer: "away", level: 5 },
+    { q: "Which answers 'to what extent'?", options: ["outside", "tomorrow", "quite", "never"], answer: "quite", level: 5 }
+  ],
+  preposition: [
+    { q: "Which word is a preposition?", options: ["run", "happy", "under", "quickly"], answer: "under", level: 1 },
+    { q: "Find the preposition: 'The cat is on the table.'", options: ["cat", "is", "on", "table"], answer: "on", level: 1 },
+    { q: "Which shows location?", options: ["and", "but", "between", "or"], answer: "between", level: 1 },
+    { q: "Identify the preposition: 'She walked through the door.'", options: ["She", "walked", "through", "door"], answer: "through", level: 2 },
+    { q: "Which shows where something is?", options: ["quickly", "above", "happy", "run"], answer: "above", level: 2 },
+    { q: "Find the preposition: 'The book is in the bag.'", options: ["book", "is", "in", "bag"], answer: "in", level: 2 },
+    { q: "Which is a preposition of time?", options: ["above", "during", "beside", "across"], answer: "during", level: 3 },
+    { q: "Find the preposition: 'He hid behind the tree.'", options: ["He", "hid", "behind", "tree"], answer: "behind", level: 3 },
+    { q: "Which tells when?", options: ["under", "before", "beside", "near"], answer: "before", level: 3 },
+    { q: "Which preposition shows direction?", options: ["at", "toward", "with", "of"], answer: "toward", level: 4 },
+    { q: "Identify the compound preposition:", options: ["in", "on", "according to", "at"], answer: "according to", level: 4 },
+    { q: "Which preposition means 'next to'?", options: ["below", "beside", "beyond", "beneath"], answer: "beside", level: 4 },
+    { q: "Find the prepositional phrase: 'The book on the shelf is mine.'", options: ["The book", "on the shelf", "is mine", "shelf is"], answer: "on the shelf", level: 5 },
+    { q: "Which preposition shows movement?", options: ["at", "into", "with", "of"], answer: "into", level: 5 },
+    { q: "Identify the preposition: 'We arrived after lunch.'", options: ["We", "arrived", "after", "lunch"], answer: "after", level: 5 }
+  ]
+};
+
+const islands = [
+  { id: 'noun', name: 'Noun Island', emoji: '🏝️', color: '#22c55e', x: 12, y: 65 },
+  { id: 'verb', name: 'Verb Island', emoji: '🌴', color: '#3b82f6', x: 28, y: 32 },
+  { id: 'adjective', name: 'Adjective Island', emoji: '🏖️', color: '#f59e0b', x: 48, y: 58 },
+  { id: 'adverb', name: 'Adverb Island', emoji: '⛱️', color: '#8b5cf6', x: 68, y: 28 },
+  { id: 'preposition', name: 'Preposition Island', emoji: '🗿', color: '#ec4899', x: 85, y: 55 }
+];
+
+// Helper for Playing Sounds (Web Audio API)
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    if (type === 'correct') {
+      // High pitched pleasant "Ding"
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } else if (type === 'wrong') {
+      // Low pitched "Buzz"
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'victory') {
+      // Victory arpeggio
+      const now = ctx.currentTime;
+      [440, 554, 659, 880].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.05, now + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.3);
+        o.start(now + i * 0.1);
+        o.stop(now + i * 0.1 + 0.3);
+      });
+    }
+  } catch (e) {
+    console.error("Audio error", e);
+  }
+};
+
+const shuffle = (arr) => {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+const SoundIndicator = ({ type }) => {
+  if (!type) return null;
+  return (
+    <div className="fixed top-4 right-4 z-50 bg-white rounded-full p-4 shadow-2xl animate-bounce">
+      <div className="text-4xl">{type === 'correct' ? '🔔' : '📢'}</div>
+      <p className="text-xs font-bold text-center mt-1">
+        {type === 'correct' ? 'Ding!' : 'Buzz!'}
+      </p>
+    </div>
+  );
+};
+
+const Confetti = ({ active }) => {
+  if (!active) return null;
+  const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#95e1d3', '#f38181', '#aa96da'];
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {[...Array(50)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-3 h-3"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: -20,
+            backgroundColor: colors[i % colors.length],
+            borderRadius: Math.random() > 0.5 ? '50%' : '0',
+            animation: `fall ${2 + Math.random() * 2}s linear forwards`,
+            animationDelay: `${Math.random() * 1}s`,
+            transform: `rotate(${Math.random() * 360}deg)`
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes fall {
+          to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const WaveBackground = () => (
+  <div className="absolute inset-0 overflow-hidden">
+    <svg className="absolute bottom-0 w-full" viewBox="0 0 1200 120" preserveAspectRatio="none" style={{ height: '15%' }}>
+      <path fill="rgba(255,255,255,0.3)" d="M0,64 C150,96 350,32 600,64 C850,96 1050,32 1200,64 L1200,120 L0,120 Z">
+        <animate attributeName="d" dur="4s" repeatCount="indefinite"
+          values="M0,64 C150,96 350,32 600,64 C850,96 1050,32 1200,64 L1200,120 L0,120 Z;
+                  M0,64 C150,32 350,96 600,64 C850,32 1050,96 1200,64 L1200,120 L0,120 Z;
+                  M0,64 C150,96 350,32 600,64 C850,96 1050,32 1200,64 L1200,120 L0,120 Z" />
+      </path>
+    </svg>
+    <svg className="absolute bottom-0 w-full" viewBox="0 0 1200 120" preserveAspectRatio="none" style={{ height: '12%' }}>
+      <path fill="rgba(255,255,255,0.2)" d="M0,32 C200,64 400,0 600,32 C800,64 1000,0 1200,32 L1200,120 L0,120 Z">
+        <animate attributeName="d" dur="3s" repeatCount="indefinite"
+          values="M0,32 C200,64 400,0 600,32 C800,64 1000,0 1200,32 L1200,120 L0,120 Z;
+                  M0,32 C200,0 400,64 600,32 C800,0 1000,64 1200,32 L1200,120 L0,120 Z;
+                  M0,32 C200,64 400,0 600,32 C800,64 1000,0 1200,32 L1200,120 L0,120 Z" />
+      </path>
+    </svg>
+  </div>
+);
+
+const AnimatedBoat = ({ x, y, isMoving }) => (
+  <div
+    className="absolute z-30 transition-all duration-[2000ms] ease-in-out"
+    style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
+  >
+    <div className={`text-5xl ${isMoving ? 'animate-bounce' : ''}`} style={{
+      animation: isMoving ? 'sail 0.5s ease-in-out infinite' : 'bob 2s ease-in-out infinite'
+    }}>
+      ⛵
+    </div>
+    {isMoving && (
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="w-2 h-2 bg-white/60 rounded-full animate-ping" style={{ animationDelay: `${i * 200}ms` }} />
+          ))}
+        </div>
+      </div>
+    )}
+    <style>{`
+      @keyframes sail { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+      @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    `}</style>
+  </div>
+);
+
+const Character = ({ emotion }) => {
+  const faces = { happy: '😊', excited: '🤩', thinking: '🤔', sad: '😢', winner: '🏆' };
+  return (
+    <div className="relative">
+      <div className="text-6xl animate-bounce">{faces[emotion] || '😊'}</div>
+      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-2 bg-black/20 rounded-full blur-sm" />
+    </div>
+  );
+};
+
+const TreasureChest = ({ isOpen, onComplete }) => {
+  useEffect(() => { 
+    if (isOpen) {
+      playSound('victory'); // Play sound when chest opens
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 2000); // Increased time slightly to enjoy the chest animation
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, onComplete]);
+  
+  return (
+    <div className="relative flex flex-col items-center">
+      <div className={`text-6xl transition-transform duration-500 ${isOpen ? 'scale-125' : ''}`}>
+        {isOpen ? '👑' : '🎁'}
+      </div>
+      {isOpen && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="absolute text-2xl animate-ping" style={{
+              transform: `rotate(${i * 45}deg) translateY(-30px)`,
+              animationDelay: `${i * 100}ms`
+            }}>✨</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const IslandSprite = ({ island, isActive, isCompleted, isLocked, onClick }) => (
+  <button
+    onClick={onClick}
+    disabled={!isActive}
+    className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500 group
+      ${isActive ? 'cursor-pointer scale-110' : 'cursor-default'}
+      ${isCompleted ? 'opacity-70' : ''} ${isLocked ? 'opacity-40 grayscale' : ''}`}
+    style={{ left: `${island.x}%`, top: `${island.y}%` }}
+  >
+    <div className={`relative ${isActive ? 'animate-pulse' : ''}`}>
+      {isActive && (
+        <div className="absolute -inset-4 rounded-full bg-yellow-400/30 animate-ping" />
+      )}
+      <div className={`rounded-full p-4 shadow-xl transition-all duration-300 
+        ${isActive ? 'ring-4 ring-yellow-400 ring-offset-2 shadow-yellow-400/50' : ''}
+        ${isCompleted ? 'ring-2 ring-green-400' : ''}`}
+        style={{ backgroundColor: island.color }}>
+        <span className="text-5xl block" style={{
+          animation: isActive ? 'wiggle 0.5s ease-in-out infinite' : 'float 3s ease-in-out infinite'
+        }}>{island.emoji}</span>
+      </div>
+      {isCompleted && (
+        <div className="absolute -top-2 -right-2 text-3xl animate-bounce">✅</div>
+      )}
+      {isActive && !isCompleted && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-2xl animate-bounce">👇</div>
+      )}
+    </div>
+    <p className={`mt-2 text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap
+      ${isActive ? 'bg-yellow-400 text-yellow-900' : 'bg-black/40 text-white'}`}>
+      {island.name}
+    </p>
+    <style>{`
+      @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+      @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    `}</style>
+  </button>
+);
+
+const Volcano = ({ isActive }) => (
+  <div className={`absolute right-2 top-1/2 -translate-y-1/2 transition-all duration-500 ${isActive ? 'scale-110' : ''}`}>
+    <div className="relative">
+      {isActive && (
+        <>
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl animate-bounce">🎯</div>
+          <div className="absolute -inset-4 rounded-full bg-orange-500/30 animate-ping" />
+        </>
+      )}
+      <div className="text-7xl" style={{ animation: 'volcanoGlow 2s ease-in-out infinite' }}>🌋</div>
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
+        {[0,1,2].map(i => (
+          <div key={i} className="text-xl" style={{
+            animation: 'smokeRise 2s ease-out infinite',
+            animationDelay: `${i * 0.5}s`, opacity: 0.6
+          }}>💨</div>
+        ))}
+      </div>
+    </div>
+    <p className="text-xs font-bold text-white bg-red-600/80 rounded-full px-3 py-1 mt-2 text-center animate-pulse">
+      Victory!
+    </p>
+    <style>{`
+      @keyframes volcanoGlow { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
+      @keyframes smokeRise { 0% { transform: translateY(0) scale(1); opacity: 0.6; }
+        100% { transform: translateY(-20px) scale(1.5); opacity: 0; } }
+    `}</style>
+  </div>
+);
+
+export default function GrammarIslandGame() {
+  const [screen, setScreen] = useState('start');
+  const [playerName, setPlayerName] = useState('');
+  const [currentIsland, setCurrentIsland] = useState(0);
+  const [questions, setQuestions] = useState([]);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [feedback, setFeedback] = useState(null);
+  const [completedIslands, setCompletedIslands] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([
+    { name: 'Grammar Pro', score: 25, time: '5:30' },
+    { name: 'Word Wizard', score: 23, time: '6:15' },
+    { name: 'Sentence Star', score: 20, time: '7:00' }
+  ]);
+  const [startTime, setStartTime] = useState(null);
+  const [boatPos, setBoatPos] = useState({ x: 5, y: 85 });
+  const [isBoatMoving, setIsBoatMoving] = useState(false);
+  const [showTreasure, setShowTreasure] = useState(false);
+  const [characterEmotion, setCharacterEmotion] = useState('happy');
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [titleAnim, setTitleAnim] = useState(false);
+  const [soundEffect, setSoundEffect] = useState(null);
+
+  useEffect(() => { setTitleAnim(true); }, []);
+
+  const generateQuestions = (islandId) => {
+    const bank = questionBank[islandId];
+    const selected = [];
+    for (let lvl = 1; lvl <= 5; lvl++) {
+      const lvlQs = shuffle(bank.filter(q => q.level === lvl));
+      if (lvlQs.length > 0) {
+        selected.push(lvlQs[0]);
+      }
+    }
+    return selected.map(q => ({ ...q, options: shuffle([...q.options]) }));
+  };
+
+  const startGame = () => {
+    if (!playerName.trim()) return;
+    setScreen('map');
+    setCurrentIsland(0);
+    setScore(0);
+    setLives(3);
+    setCompletedIslands([]);
+    setStartTime(Date.now());
+    setBoatPos({ x: 5, y: 85 });
+    setCharacterEmotion('excited');
+    playSound('correct'); // Intro sound
+  };
+
+  const startIsland = (idx) => {
+    if (idx !== currentIsland || isBoatMoving) return;
+    const island = islands[idx];
+    setIsBoatMoving(true);
+    setBoatPos({ x: island.x, y: island.y + 18 });
+    setTimeout(() => {
+      setIsBoatMoving(false);
+      setQuestions(generateQuestions(island.id));
+      setCurrentQ(0);
+      setFeedback(null);
+      setCharacterEmotion('thinking');
+      setScreen('quiz');
+    }, 2000);
+  };
+
+  const handleTreasureComplete = () => {
+    setShowTreasure(false);
+    if (currentIsland < 4) {
+      const nextIsland = currentIsland + 1;
+      setCurrentIsland(nextIsland);
+      setScreen('map');
+      setCharacterEmotion('excited');
+    } else {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+      setLeaderboard(lb => [...lb, { name: playerName, score, time: timeStr }].sort((a, b) => b.score - a.score).slice(0, 10));
+      setShowConfetti(true);
+      setCharacterEmotion('winner');
+      playSound('victory');
+      setScreen('victory');
+    }
+  };
+
+  const handleAnswer = (ans) => {
+    if (feedback) return;
+    const correct = ans === questions[currentQ].answer;
+    
+    setSoundEffect(correct ? 'correct' : 'wrong');
+    playSound(correct ? 'correct' : 'wrong'); // <--- Actual Sound
+    setTimeout(() => setSoundEffect(null), 1000);
+    
+    if (correct) {
+      setScore(s => s + 1);
+      setFeedback({ type: 'correct', msg: '🎉 Awesome! You got it!' });
+      setCharacterEmotion('excited');
+    } else {
+      setLives(l => l - 1);
+      setFeedback({ type: 'wrong', msg: `❌ Not quite! It was: ${questions[currentQ].answer}` });
+      setCharacterEmotion('sad');
+    }
+    
+    setTimeout(() => {
+      setFeedback(null);
+      
+      if (!correct && lives <= 1) {
+        setScreen('gameover');
+        return;
+      }
+      
+      if (currentQ < 4) {
+        setCurrentQ(q => q + 1);
+        setCharacterEmotion('thinking');
+      } else {
+        // Completed the island!
+        const newCompleted = [...completedIslands, currentIsland];
+        setCompletedIslands(newCompleted);
+        setShowTreasure(true);
+      }
+    }, 1800);
+  };
+
+  const renderHearts = () => (
+    <div className="flex gap-1">
+      {[...Array(3)].map((_, i) => (
+        <span key={i} className={`text-2xl transition-all duration-300 ${i >= lives ? 'grayscale opacity-50' : 'animate-pulse'}`}>
+          {i < lives ? '❤️' : '🖤'}
+        </span>
+      ))}
+    </div>
+  );
+
+  // Render Logic
+  if (screen === 'start') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-400 via-cyan-400 to-blue-500 flex items-center justify-center p-4 relative overflow-hidden">
+        <WaveBackground />
+        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDelay: '0s' }}>🌴</div>
+        <div className="absolute top-20 right-16 text-5xl animate-bounce" style={{ animationDelay: '0.5s' }}>🦜</div>
+        <div className="absolute bottom-32 left-8 text-4xl animate-bounce" style={{ animationDelay: '1s' }}>🐚</div>
+        <div className="absolute bottom-40 right-12 text-5xl animate-bounce" style={{ animationDelay: '0.3s' }}>🦀</div>
+        
+        <div className={`bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative z-10 transition-all duration-1000 ${titleAnim ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+          <div className="flex justify-center gap-2 text-5xl mb-4">
+            <span className="animate-bounce" style={{ animationDelay: '0s' }}>🏝️</span>
+            <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>⛵</span>
+            <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>🌋</span>
+          </div>
+          <h1 className="text-4xl font-black mb-2" style={{
+            background: 'linear-gradient(90deg, #059669, #0891b2, #7c3aed, #db2777)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            animation: 'gradient 3s ease infinite', backgroundSize: '200% 200%'
+          }}>
+            Grammar Island
+          </h1>
+          <p className="text-2xl font-bold text-cyan-600 mb-4">Adventure! 🗺️</p>
+          <div className="mb-6"><Character emotion="happy" /></div>
+          <input
+            type="text"
+            placeholder="🏴‍☠️ Enter your name, Explorer!"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            className="w-full px-4 py-4 rounded-2xl border-3 border-cyan-300 focus:border-cyan-500 outline-none text-center text-xl mb-4 bg-cyan-50 font-medium"
+            maxLength={15}
+          />
+          <button
+            onClick={startGame}
+            disabled={!playerName.trim()}
+            className="w-full py-4 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 text-white text-2xl font-black rounded-2xl hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100 shadow-xl"
+          >
+            🚀 Set Sail!
+          </button>
+          <div className="mt-6 text-left bg-cyan-50 rounded-2xl p-4">
+            <p className="font-bold text-cyan-700 mb-2">🎯 Your Quest:</p>
+            <div className="grid grid-cols-2 gap-2 text-sm text-cyan-600">
+              <p>🏝️ 5 Islands</p>
+              <p>❓ 5 Questions each</p>
+              <p>❤️ 3 Lives total</p>
+              <p>🌋 Reach the Volcano!</p>
+            </div>
+          </div>
+        </div>
+        <style>{`@keyframes gradient { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }`}</style>
+      </div>
+    );
+  }
+
+  if (screen === 'map') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-400 via-cyan-400 to-blue-500 p-3 relative overflow-hidden">
+        <WaveBackground />
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="flex justify-between items-center mb-3 bg-white/90 backdrop-blur rounded-2xl p-3 shadow-xl">
+            <div className="flex items-center gap-3">
+              <Character emotion={characterEmotion} />
+              <div>
+                <p className="text-xs text-gray-500">Explorer</p>
+                <p className="font-bold text-lg text-emerald-700">{playerName}</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500">Score</p>
+              <p className="font-bold text-3xl bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">{score}/25</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 text-right">Lives</p>
+              {renderHearts()}
+            </div>
+          </div>
+
+          <div className="relative bg-gradient-to-br from-cyan-400 to-blue-500 rounded-3xl h-[500px] shadow-2xl overflow-hidden border-4 border-white/50">
+            <div className="absolute inset-0 opacity-30" style={{
+              backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)'
+            }} />
+
+            <AnimatedBoat x={boatPos.x} y={boatPos.y} isMoving={isBoatMoving} />
+
+            {islands.map((island, idx) => (
+              <IslandSprite
+                key={island.id}
+                island={island}
+                isActive={idx === currentIsland && !isBoatMoving}
+                isCompleted={completedIslands.includes(idx)}
+                isLocked={idx > currentIsland}
+                onClick={() => startIsland(idx)}
+              />
+            ))}
+
+            <Volcano isActive={currentIsland === 4 && completedIslands.length === 5} />
+
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+              <defs>
+                <linearGradient id="pathGradient">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.2)" />
+                </linearGradient>
+              </defs>
+              {islands.slice(0, -1).map((island, i) => (
+                <path
+                  key={i}
+                  d={`M ${island.x}% ${island.y + 10}% Q ${(island.x + islands[i + 1].x) / 2}% ${(island.y + islands[i + 1].y) / 2 - 5}% ${islands[i + 1].x}% ${islands[i + 1].y + 10}%`}
+                  stroke="url(#pathGradient)"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeDasharray="10,5"
+                  opacity={completedIslands.includes(i) ? "0.8" : "0.4"}
+                />
+              ))}
+            </svg>
+
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="absolute text-4xl opacity-20" style={{
+                left: `${15 + i * 15}%`, top: `${10 + (i % 3) * 30}%`,
+                animation: 'float 4s ease-in-out infinite',
+                animationDelay: `${i * 0.5}s`
+              }}>☁️</div>
+            ))}
+          </div>
+
+          <div className="mt-4 bg-white/90 backdrop-blur rounded-2xl p-4 shadow-xl text-center">
+            <p className="text-xl font-bold text-gray-700">
+              {isBoatMoving ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="animate-spin">🧭</span> Sailing to {islands[currentIsland]?.name}...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2 animate-pulse">
+                  👆 Click on {islands[currentIsland]?.name || 'the island'}!
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'quiz') {
+    const island = islands[currentIsland];
+    const q = questions[currentQ];
+    return (
+      <div className="min-h-screen p-4 flex items-center justify-center relative overflow-hidden" 
+        style={{ background: `linear-gradient(135deg, ${island.color}60, ${island.color}30)` }}>
+        <SoundIndicator type={soundEffect} />
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="absolute" style={{
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              fontSize: '3rem', animation: 'float 6s ease-in-out infinite',
+              animationDelay: `${i * 0.3}s`
+            }}>{island.emoji}</div>
+          ))}
+        </div>
+
+        <div className="max-w-2xl w-full relative z-10">
+          <div className="flex justify-between items-center mb-4 bg-white/95 rounded-2xl p-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl animate-bounce">{island.emoji}</span>
+              <div>
+                <span className="font-black text-lg" style={{ color: island.color }}>{island.name}</span>
+                <p className="text-xs text-gray-500">Question {currentQ + 1} of 5</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Score</p>
+                <p className="font-bold text-2xl text-emerald-600">{score}</p>
+              </div>
+              {renderHearts()}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className={`h-3 flex-1 rounded-full transition-all duration-500 ${
+                  i < currentQ ? 'bg-emerald-500 shadow-lg' : 
+                  i === currentQ ? 'bg-yellow-400 animate-pulse shadow-lg' : 
+                  'bg-white/50'
+                }`} />
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 mb-4">
+            <div className="flex items-start gap-4 mb-6">
+              <Character emotion={characterEmotion} />
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    q.level === 1 ? 'bg-green-200 text-green-700' :
+                    q.level === 2 ? 'bg-blue-200 text-blue-700' :
+                    q.level === 3 ? 'bg-yellow-200 text-yellow-700' :
+                    q.level === 4 ? 'bg-orange-200 text-orange-700' :
+                    'bg-red-200 text-red-700'
+                  }`}>
+                    {['⭐ Easy', '⭐⭐ Easy', '⭐⭐⭐ Medium', '⭐⭐⭐⭐ Hard', '⭐⭐⭐⭐⭐ Expert'][q.level - 1]}
+                  </span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">{q.q}</h2>
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              {q.options.map((opt, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleAnswer(opt)}
+                  disabled={!!feedback}
+                  className={`group p-5 rounded-2xl text-left font-semibold transition-all duration-300 ${
+                    feedback
+                      ? opt === q.answer
+                        ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white scale-105 shadow-2xl'
+                        : 'bg-gray-100 text-gray-400 opacity-50'
+                      : 'bg-gradient-to-r from-gray-50 to-gray-100 hover:from-cyan-50 hover:to-blue-50 hover:scale-102 hover:shadow-xl active:scale-98 border-2 border-transparent hover:border-cyan-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className={`flex items-center justify-center w-10 h-10 rounded-full font-black text-lg transition-all ${
+                      feedback && opt === q.answer
+                        ? 'bg-white/30 text-white scale-110'
+                        : 'bg-white text-gray-700 group-hover:bg-cyan-500 group-hover:text-white'
+                    }`}>
+                      {feedback && opt === q.answer ? '✓' : String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="flex-1 text-lg">{opt}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {feedback && (
+              <div className={`mt-6 p-6 rounded-2xl text-center font-bold text-xl shadow-lg transform scale-100 animate-bounce ${
+                feedback.type === 'correct' 
+                  ? 'bg-gradient-to-r from-emerald-400 to-green-400 text-white' 
+                  : 'bg-gradient-to-r from-red-400 to-pink-400 text-white'
+              }`}>
+                {feedback.msg}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* HERE IS THE FIX: Move showTreasure here so it overlays the Quiz screen */}
+        {showTreasure && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl p-8 text-center shadow-2xl transform scale-100 transition-transform">
+              <h2 className="text-3xl font-bold text-emerald-600 mb-4">🎊 Island Conquered! 🎊</h2>
+              <TreasureChest isOpen={true} onComplete={handleTreasureComplete} />
+              <p className="mt-4 text-lg text-gray-600">+5 Questions Completed!</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (screen === 'victory') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-orange-500 via-red-500 to-yellow-600 flex items-center justify-center p-4 relative overflow-hidden">
+        <Confetti active={showConfetti} />
+        <WaveBackground />
+        
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="absolute text-6xl" style={{
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              animation: 'float 4s ease-in-out infinite',
+              animationDelay: `${Math.random() * 2}s`
+            }}>🏆</div>
+          ))}
+        </div>
+
+        <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative z-10 transform scale-100 animate-bounce" style={{ animationIterationCount: 1 }}>
+          <div className="mb-4">
+            <div className="text-8xl mb-2 animate-bounce">🌋</div>
+            <Character emotion="winner" />
+          </div>
+          
+          <h1 className="text-4xl font-black mb-2 bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
+            🎉 VICTORY! 🎉
+          </h1>
+          <p className="text-xl text-gray-700 font-bold mb-1">Congratulations, {playerName}!</p>
+          <p className="text-gray-600 mb-6">You conquered all Grammar Islands! 🏝️⛵🌋</p>
+          
+          <div className="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-3xl p-6 mb-6 shadow-inner">
+            <div className="text-6xl font-black bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">{score}/25</div>
+            <p className="text-gray-700 font-bold text-lg">Final Score</p>
+            <div className="flex justify-center gap-1 mt-2">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className="text-3xl animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}>⭐</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-5 mb-6 text-left shadow-lg">
+            <h3 className="font-black text-gray-800 mb-4 flex items-center gap-2 text-xl">
+              🏆 Leaderboard
+            </h3>
+            <div className="space-y-2">
+              {leaderboard.slice(0, 5).map((entry, i) => (
+                <div key={i} className={`flex justify-between items-center p-3 rounded-xl transition-all ${
+                  entry.name === playerName 
+                    ? 'bg-gradient-to-r from-yellow-300 to-orange-300 font-black shadow-lg scale-105' 
+                    : 'bg-white/70'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
+                    <span className="font-bold">{entry.name}</span>
+                  </div>
+                  <div className="flex gap-4 text-sm font-bold">
+                    <span className="text-orange-600">{entry.score} pts</span>
+                    <span className="text-gray-600">{entry.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => { setScreen('start'); setPlayerName(''); setShowConfetti(false); }}
+            className="w-full py-4 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white text-2xl font-black rounded-2xl hover:scale-105 transition-all shadow-xl"
+          >
+            🔄 Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'gameover') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          {[...Array(15)].map((_, i) => (
+            <div key={i} className="absolute text-5xl" style={{
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              animation: 'float 5s ease-in-out infinite',
+              animationDelay: `${Math.random() * 2}s`
+            }}>💔</div>
+          ))}
+        </div>
+
+        <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative z-10">
+          <div className="text-8xl mb-4 animate-bounce" style={{ animationIterationCount: 3 }}>💔</div>
+          <div className="mb-4"><Character emotion="sad" /></div>
+          
+          <h1 className="text-3xl font-black text-gray-800 mb-2">Game Over</h1>
+          <p className="text-xl text-gray-700 font-bold mb-1">Don't give up, {playerName}!</p>
+          <p className="text-gray-600 mb-6">You made it through {completedIslands.length} island{completedIslands.length !== 1 ? 's' : ''}!</p>
+          
+          <div className="bg-gray-100 rounded-3xl p-6 mb-6 shadow-inner">
+            <p className="text-5xl font-black text-gray-700 mb-2">{score}/25</p>
+            <p className="text-gray-600 font-bold">Final Score</p>
+          </div>
+
+          <div className="bg-blue-50 rounded-2xl p-4 mb-6">
+            <p className="text-sm text-gray-700 font-medium mb-2">💡 Remember:</p>
+            <p className="text-xs text-gray-600">Practice makes perfect! Try again and reach the volcano! 🌋</p>
+          </div>
+
+          <button
+            onClick={() => { setScreen('start'); setPlayerName(''); }}
+            className="w-full py-4 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 text-white text-2xl font-black rounded-2xl hover:scale-105 transition-all shadow-xl"
+          >
+            🔄 Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
