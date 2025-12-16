@@ -30,7 +30,12 @@ export const questionBank: Record<string, Question[]> = {
     { q: "Which shows more than one?", options: ["box", "boxes", "boxing", "boxer"], answer: "boxes", level: 4 },
     { q: "Find the compound noun:", options: ["sunshine", "bright", "warm", "shining"], answer: "sunshine", level: 5 },
     { q: "Which word names an idea?", options: ["desk", "pencil", "freedom", "chair"], answer: "freedom", level: 5 },
-    { q: "Identify the proper noun:", options: ["ocean", "Pacific Ocean", "water", "wave"], answer: "Pacific Ocean", level: 5 }
+    { q: "Identify the proper noun:", options: ["ocean", "Pacific Ocean", "water", "wave"], answer: "Pacific Ocean", level: 5 },
+    { q: "Which word is a noun?", options: ["eat", "apple", "loud", "in"], answer: "apple", level: 1 },
+    { q: "Find the noun: 'The car is fast.'", options: ["The", "car", "is", "fast"], answer: "car", level: 1 },
+    { q: "Which is a proper noun?", options: ["country", "Spain", "flag", "map"], answer: "Spain", level: 2 },
+    { q: "Identify the plural noun:", options: ["cats", "cat", "run", "funny"], answer: "cats", level: 3 },
+    { q: "Find the compound noun:", options: ["raincoat", "raining", "wet", "water"], answer: "raincoat", level: 5 }
   ],
   verb: [
     { q: "Which word is a verb?", options: ["jump", "beautiful", "tree", "slowly"], answer: "jump", level: 1 },
@@ -47,7 +52,12 @@ export const questionBank: Record<string, Question[]> = {
     { q: "Which is the past tense of 'eat'?", options: ["eated", "ate", "eating", "eats"], answer: "ate", level: 4 },
     { q: "Find the verb phrase: 'She has been studying all day.'", options: ["She", "has been studying", "all", "day"], answer: "has been studying", level: 5 },
     { q: "Which verb needs a helper?", options: ["run", "been running", "runs", "ran"], answer: "been running", level: 5 },
-    { q: "Identify the main verb: 'They will go tomorrow.'", options: ["They", "will", "go", "tomorrow"], answer: "go", level: 5 }
+    { q: "Identify the main verb: 'They will go tomorrow.'", options: ["They", "will", "go", "tomorrow"], answer: "go", level: 5 },
+    { q: "Which word is a verb?", options: ["chair", "sleep", "green", "happy"], answer: "sleep", level: 1 },
+    { q: "Find the verb: 'We play soccer.'", options: ["We", "play", "soccer", "game"], answer: "play", level: 1 },
+    { q: "Which is a past tense verb?", options: ["talk", "talked", "talking", "will talk"], answer: "talked", level: 2 },
+    { q: "Which sentence uses future tense?", options: ["He cooked.", "He cooks.", "He will cook.", "He is cooking."], answer: "He will cook.", level: 4 },
+    { q: "Which verb shows being?", options: ["run", "am", "sleep", "throw"], answer: "am", level: 3 }
   ],
   adjective: [
     { q: "Which word is an adjective?", options: ["run", "blue", "quickly", "house"], answer: "blue", level: 1 },
@@ -64,7 +74,12 @@ export const questionBank: Record<string, Question[]> = {
     { q: "Which adjective describes color?", options: ["slowly", "green", "running", "loudly"], answer: "green", level: 4 },
     { q: "Find the compound adjective:", options: ["happy", "well-known", "bright", "small"], answer: "well-known", level: 5 },
     { q: "Which shows the most?", options: ["smart", "smarter", "smartest", "smartly"], answer: "smartest", level: 5 },
-    { q: "Identify the adjective: 'An honest person tells the truth.'", options: ["honest", "person", "tells", "truth"], answer: "honest", level: 5 }
+    { q: "Identify the adjective: 'An honest person tells the truth.'", options: ["honest", "person", "tells", "truth"], answer: "honest", level: 5 },
+    { q: "Which word is an adjective?", options: ["hot", "run", "car", "boy"], answer: "hot", level: 1 },
+    { q: "Find the adjective: 'A cold drink.'", options: ["A", "cold", "drink", "cup"], answer: "cold", level: 1 },
+    { q: "Which is a comparative adjective?", options: ["short", "shorter", "shortest", "shortly"], answer: "shorter", level: 3 },
+    { q: "Which is a superlative adjective?", options: ["fast", "faster", "fastest", "fasting"], answer: "fastest", level: 3 },
+    { q: "Which adjective describes a shape?", options: ["round", "red", "loud", "heavy"], answer: "round", level: 4 }
   ],
   adverb: [
     { q: "Which word is an adverb?", options: ["fast", "quickly", "quick", "speed"], answer: "quickly", level: 1 },
@@ -81,7 +96,12 @@ export const questionBank: Record<string, Question[]> = {
     { q: "Which adverb tells how often?", options: ["here", "tomorrow", "sometimes", "carefully"], answer: "sometimes", level: 4 },
     { q: "Which adverb shows degree?", options: ["now", "here", "extremely", "daily"], answer: "extremely", level: 5 },
     { q: "Find the adverb: 'The rabbit hopped away.'", options: ["rabbit", "hopped", "away", "The"], answer: "away", level: 5 },
-    { q: "Which answers 'to what extent'?", options: ["outside", "tomorrow", "quite", "never"], answer: "quite", level: 5 }
+    { q: "Which answers 'to what extent'?", options: ["outside", "tomorrow", "quite", "never"], answer: "quite", level: 5 },
+    { q: "Which word is an adverb?", options: ["sadly", "sad", "cry", "tears"], answer: "sadly", level: 1 },
+    { q: "Find the adverb: 'He spoke clearly.'", options: ["He", "spoke", "clearly", "words"], answer: "clearly", level: 2 },
+    { q: "Which adverb tells 'when'?", options: ["now", "here", "loudly", "up"], answer: "now", level: 3 },
+    { q: "Which adverb tells 'where'?", options: ["everywhere", "later", "daily", "softly"], answer: "everywhere", level: 4 },
+    { q: "Which adverb shows degree?", options: ["too", "run", "fast", "blue"], answer: "too", level: 5 }
   ],
   preposition: [
     { q: "Which word is a preposition?", options: ["run", "happy", "under", "quickly"], answer: "under", level: 1 },
@@ -98,7 +118,12 @@ export const questionBank: Record<string, Question[]> = {
     { q: "Which preposition means 'next to'?", options: ["below", "beside", "beyond", "beneath"], answer: "beside", level: 4 },
     { q: "Find the prepositional phrase: 'The book on the shelf is mine.'", options: ["The book", "on the shelf", "is mine", "shelf is"], answer: "on the shelf", level: 5 },
     { q: "Which preposition shows movement?", options: ["at", "into", "with", "of"], answer: "into", level: 5 },
-    { q: "Identify the preposition: 'We arrived after lunch.'", options: ["We", "arrived", "after", "lunch"], answer: "after", level: 5 }
+    { q: "Identify the preposition: 'We arrived after lunch.'", options: ["We", "arrived", "after", "lunch"], answer: "after", level: 5 },
+    { q: "Which word is a preposition?", options: ["over", "jump", "red", "fast"], answer: "over", level: 1 },
+    { q: "Find the preposition: 'Sit by the fire.'", options: ["Sit", "by", "the", "fire"], answer: "by", level: 2 },
+    { q: "Which shows location?", options: ["inside", "run", "blue", "quickly"], answer: "inside", level: 3 },
+    { q: "Which shows direction?", options: ["to", "at", "in", "on"], answer: "to", level: 4 },
+    { q: "Find the preposition: 'Walk across the street.'", options: ["Walk", "across", "the", "street"], answer: "across", level: 5 }
   ]
 };
 
