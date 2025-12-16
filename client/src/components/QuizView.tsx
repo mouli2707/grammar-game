@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Question, Island } from '@/lib/gameData';
@@ -17,6 +17,12 @@ interface QuizViewProps {
 
 export default function QuizView({ island, question, questionIndex, totalQuestions, score, lives, onAnswer, feedback }: QuizViewProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  
+useEffect(() => {
+  setSelectedAnswer(null);
+}, [questionIndex]);
+
+
   
   const handleAnswerClick = (answer: string) => {
     if (feedback) return;
